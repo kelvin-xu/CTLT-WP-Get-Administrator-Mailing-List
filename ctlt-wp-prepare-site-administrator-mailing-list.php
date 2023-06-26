@@ -91,6 +91,7 @@ function init() {
 
 
 		foreach ($ids as $key => $id) {
+			global $wpdb;
 			$wpdb->dmtable = $wpdb->base_prefix . 'domain_mapping';
 			$domain = $wpdb->get_var( "SELECT domain FROM {$wpdb->dmtable} WHERE blog_id = '{$wpdb->blogid}' AND active = 1 LIMIT 1" );
 			$url = null == $domain ? get_site_url( $id ) : $domain;
