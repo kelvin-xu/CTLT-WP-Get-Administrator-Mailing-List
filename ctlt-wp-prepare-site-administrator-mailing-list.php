@@ -3,7 +3,7 @@
  *
  * Plugin Name:       CTLT Prepare Site Administrator Mailing List
  * Plugin URI:        https://ctlt.ubc.ca
- * Description:       Based on a list of site URLs, prepare a CSV file includes administrators email addresses.
+ * Description:       Based on a list of site IDs, prepare a CSV file includes administrators email addresses.
  * Version:           1.0.0
  * Requires at least: 5.2
  * Requires PHP:      7.2
@@ -43,7 +43,7 @@ function init() {
 	}
 
 	function render_network_menu_content() {
-		if( isset( $_POST['site_urls'] ) ) {
+		if( isset( $_POST['site_ids'] ) ) {
 			get_mailing_list();
 			return;
 		}
@@ -55,20 +55,14 @@ function init() {
 				<h1>Site Administrator Mailing List</h1>
 			</div>
 			<form method="post" action="<?php echo esc_url( network_admin_url( 'index.php?page=' . $current_page ) ); ?>" onsubmit = "return( validate());">
-				<textarea name="site_urls" id="site_urls" cols="50" rows="10"></textarea>
+				<textarea name="site_ids" id="site_ids" cols="50" rows="10"></textarea>
 				<br />
 				<input type="submit" name="submit" id="submit" class="button button-primary" value="Run">
 			</form>
 
 			<script>
 				function validate() {
-					let input = document.getElementById('site_urls').value;
-					var urlPattern = new RegExp('^(https?:\\/\\/)?'+ // validate protocol
-						'((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // validate domain name
-						'((\\d{1,3}\\.){3}\\d{1,3}))'+ // validate OR ip (v4) address
-						'(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // validate port and path
-						'(\\?[;&a-z\\d%_.~+=-]*)?'+ // validate query string
-						'(\\#[-a-z\\d_]*)?$','i'); // validate fragment locator
+					let input = document.getElementById('site_ids').value;
 
 					if ( ! input ) {
 						alert( 'Input not valid.' );
@@ -76,14 +70,9 @@ function init() {
 					}
 
 					input = input.split(',');
-					input = input.map(function(element) {
-						return element.replaceAll( '"', '' );
-					});
-
-					document.getElementById('site_urls').value = input.join(',');
 
 					for( let i=0;i<input.length;i++){
-						if ( ! validURL( input[i].replaceAll( '"', '' ) ) ) {
+						if ( ! is_int( input[i] ) ) {
 							alert( 'Input not valid.' );
 							return false;
 						}
@@ -92,26 +81,17 @@ function init() {
 					return true;
 				}
 				
-				function validURL(str) {
-					var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
-						'((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
-						'((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
-						'(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
-						'(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
-						'(\\#[-a-z\\d_]*)?$','i'); // fragment locator
-					return !!pattern.test(str);
-				}
 			</script>
 		<?php echo ob_get_clean();
 	}
 
 	function get_mailing_list() {
-		$urls = explode(",", $_POST['site_urls']);
+		$ids = explode(",", $_POST['site_ids']);
 		$out = '<pre>';
 
 
-		foreach ($urls as $key => $url) {
-			$id = get_blog_id_from_url( $url );
+		foreach ($ids as $key => $id) {
+			$url = get_site_url( $id );
 			$out .= $id . ',' . $url . ',';
 
 			$user_query = new \WP_User_Query( array(
