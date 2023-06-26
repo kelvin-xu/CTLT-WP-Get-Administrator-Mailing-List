@@ -96,7 +96,7 @@ function init() {
 			$mapped_domain = $wpdb->get_var( "SELECT domain FROM {$dmtable} WHERE blog_id = '{$id}' AND active = 1 LIMIT 1" );
 			$url = null == $mapped_domain ? get_site_url( $id ) : $mapped_domain;
 			// Just need the domain
-			$domain = str_replace(array('http:', 'https:', '/'), array('','',''), $url);
+			$domain = str_replace(array('https:','http:','/'), array('','',''), $url);
 
 			$out .= $id . ',' . $domain . ',';
 
