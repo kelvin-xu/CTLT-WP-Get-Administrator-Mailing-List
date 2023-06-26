@@ -1,0 +1,12 @@
+{
+    "name": "ubc/ubc-epayments-upay-integration",
+    "type": "wordpress-plugin",
+    "require": {
+        "wp-coding-standards/wpcs": "^2.3"
+    },
+    "scripts": {
+        "post-update-cmd": [
+            "vendor/bin/phpcs --config-set installed_paths ../../wp-coding-standards/wpcs"
+        ]
+    }
+}
