@@ -91,7 +91,9 @@ function init() {
 
 
 		foreach ($ids as $key => $id) {
-			$url = get_site_url( $id );
+			$wpdb->dmtable = $wpdb->base_prefix . 'domain_mapping';
+			$domain = $wpdb->get_var( "SELECT domain FROM {$wpdb->dmtable} WHERE blog_id = '{$wpdb->blogid}' AND active = 1 LIMIT 1" );
+			$url = null == $domain ? get_site_url( $id ) : $domain;
 			$out .= $id . ',' . $url . ',';
 
 			$user_query = new \WP_User_Query( array(
